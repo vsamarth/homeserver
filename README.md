@@ -55,25 +55,43 @@ These scripts back up and restore only `vaultwarden_data/`.
 
    Run the one-time initializer before the first backup:
    ```bash
-   ./init-backup-repo.py
+   ./backup/init-backup-repo.py
    ```
 
 2. Run a backup:
    ```bash
-   ./backup.py
+   ./backup/backup.py
    ```
 
 3. Restore the latest snapshot:
    ```bash
-   ./restore.py
+   ./backup/restore.py
    ```
 
    Or restore a specific snapshot:
    ```bash
-   ./restore.py <snapshot-id>
+   ./backup/restore.py <snapshot-id>
    ```
 
 The backup script runs Vaultwarden’s own database backup command first, then uploads `vaultwarden_data/` to restic in Backblaze B2.
+
+## Scheduling
+
+Use the systemd units to automate backups and pruning:
+
+```bash
+sudo cp backup/vaultwarden-backup.service /etc/systemd/system/
+sudo cp backup/vaultwarden-backup.timer /etc/systemd/system/
+sudo cp backup/vaultwarden-prune.service /etc/systemd/system/
+sudo cp backup/vaultwarden-prune.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now vaultwarden-backup.timer vaultwarden-prune.timer
+```
+
+The backup timer runs daily. The prune timer runs weekly and keeps:
+- 7 daily snapshots
+- 4 weekly snapshots
+- 12 monthly snapshots
 
 ## Notes
 
