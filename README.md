@@ -40,6 +40,40 @@ On a server where Docker is already installed and the `.env` file is present, us
 
 This script creates the bind-mounted data directories, checks Docker daemon settings, pulls images, and starts the Compose stack.
 
+## Vaultwarden Backup
+
+These scripts back up and restore only `vaultwarden_data/`.
+
+1. Add the Backblaze and restic values to `.env`.
+
+   The backup section in `.env` should include:
+   - `RESTIC_REPOSITORY`
+   - `RESTIC_PASSWORD`
+   - `B2_ACCOUNT_ID`
+   - `B2_ACCOUNT_KEY`
+
+   Run the one-time initializer before the first backup:
+   ```bash
+   ./init-backup-repo.sh
+   ```
+
+2. Run a backup:
+   ```bash
+   ./backup.sh
+   ```
+
+3. Restore the latest snapshot:
+   ```bash
+   ./restore.sh
+   ```
+
+   Or restore a specific snapshot:
+   ```bash
+   ./restore.sh <snapshot-id>
+   ```
+
+The backup script runs Vaultwarden’s own database backup command first, then uploads `vaultwarden_data/` to restic in Backblaze B2.
+
 ## Notes
 
 - `.env` should stay local and uncommitted.
