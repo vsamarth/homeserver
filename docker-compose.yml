@@ -33,11 +33,7 @@ services:
     environment:
       APP_URL: https://home.samarthv.com
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "sh -ec 'if command -v wget >/dev/null 2>&1; then wget -qO- http://127.0.0.1:8090/ >/dev/null; elif command -v curl >/dev/null 2>&1; then curl -fsS http://127.0.0.1:8090/ >/dev/null; else exit 1; fi'",
-        ]
+      test: ["CMD", "curl", "-fsS", "https://home.samarthv.com"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -73,11 +69,7 @@ services:
       WEBSOCKET_ENABLED: "true"
       ADMIN_TOKEN: ${VAULTWARDEN_ADMIN_TOKEN}
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "sh -ec 'if command -v wget >/dev/null 2>&1; then wget -qO- http://127.0.0.1:80/alive >/dev/null; elif command -v curl >/dev/null 2>&1; then curl -fsS http://127.0.0.1:80/alive >/dev/null; else exit 1; fi'",
-        ]
+      test: ["CMD", "curl", "-fsS", "https://vault.samarthv.com"]
       interval: 30s
       timeout: 10s
       retries: 3
