@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import os
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -79,6 +80,11 @@ def main() -> int:
             restic_tag,
         ]
     )
+
+    print("❯❯ Cleaning up generated Vaultwarden database backups...")
+    for backup_file in vaultwarden_data_dir.glob("db_*.sqlite3"):
+        if re.fullmatch(r"db_\d{8}_\d{6}\.sqlite3", backup_file.name):
+            backup_file.unlink(missing_ok=True)
 
     print("❯❯ Vaultwarden backup completed")
     return 0
