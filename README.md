@@ -51,25 +51,26 @@ These scripts back up and restore only `vaultwarden_data/`.
    - `RESTIC_PASSWORD`
    - `B2_ACCOUNT_ID`
    - `B2_ACCOUNT_KEY`
+   - quote values that contain spaces or `$`
 
    Run the one-time initializer before the first backup:
    ```bash
-   ./init-backup-repo.sh
+   ./init-backup-repo.py
    ```
 
 2. Run a backup:
    ```bash
-   ./backup.sh
+   ./backup.py
    ```
 
 3. Restore the latest snapshot:
    ```bash
-   ./restore.sh
+   ./restore.py
    ```
 
    Or restore a specific snapshot:
    ```bash
-   ./restore.sh <snapshot-id>
+   ./restore.py <snapshot-id>
    ```
 
 The backup script runs Vaultwarden’s own database backup command first, then uploads `vaultwarden_data/` to restic in Backblaze B2.
