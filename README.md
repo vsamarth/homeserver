@@ -80,13 +80,10 @@ The backup script runs Vaultwarden’s own database backup command first, then u
 Use the systemd units to automate backups and pruning:
 
 ```bash
-sudo cp backup/vaultwarden-backup.service /etc/systemd/system/
-sudo cp backup/vaultwarden-backup.timer /etc/systemd/system/
-sudo cp backup/vaultwarden-prune.service /etc/systemd/system/
-sudo cp backup/vaultwarden-prune.timer /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now vaultwarden-backup.timer vaultwarden-prune.timer
+./backup/install-backup-timers.py
 ```
+
+It will use `sudo` for the systemd install if you are not already root.
 
 The backup timer runs daily. The prune timer runs weekly and keeps:
 - 7 daily snapshots

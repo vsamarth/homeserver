@@ -33,11 +33,11 @@ services:
     environment:
       APP_URL: https://home.samarthv.com
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "https://home.samarthv.com"]
-      interval: 30s
+      test: ["CMD", "/beszel", "health", "--url", "http://localhost:8090"]
+      interval: 120s
       timeout: 10s
       retries: 3
-      start_period: 30s
+      start_period: 5s
     networks:
       - home-net
 
@@ -61,6 +61,12 @@ services:
       TOKEN: ${BESZEL_AGENT_TOKEN}
       KEY: ${BESZEL_AGENT_KEY}
       HUB_URL: https://home.samarthv.com
+    healthcheck:
+      test: ["CMD", "/agent", "health"]
+      interval: 120s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
 
   vaultwarden:
     image: vaultwarden/server:latest
