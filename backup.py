@@ -82,9 +82,12 @@ def main() -> int:
     )
 
     print("❯❯ Cleaning up generated Vaultwarden database backups...")
-    for backup_file in vaultwarden_data_dir.glob("db_*.sqlite3"):
-        if re.fullmatch(r"db_\d{8}_\d{6}\.sqlite3", backup_file.name):
-            backup_file.unlink(missing_ok=True)
+    if docker_container_running(vaultwarden_service):
+        for backup_file in vaultwarden_data_dir.glob("db_*.sqlite3"):
+            if re.fullmatch(r"db_\d{8}_\d{6}\.sqlite3", backup_file.name):
+                docker_exec(vaultwarden_service, ["rm", "-f", f"/data/{backup_file.name}"])
+    else:
+        print("❯❯ Vaultwarden is not running; no generated database backup files to clean up.")
 
     print("❯❯ Vaultwarden backup completed")
     return 0
