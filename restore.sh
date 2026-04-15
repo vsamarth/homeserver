@@ -39,6 +39,32 @@ require_command() {
     fi
 }
 
+load_env_file() {
+    local path="$1"
+    local line key value
+
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+        [[ "$line" != *=* ]] && continue
+
+        key="${line%%=*}"
+        value="${line#*=}"
+        key="${key%%[[:space:]]*}"
+        key="${key##[[:space:]]}"
+        value="${value#${value%%[![:space:]]*}}"
+        value="${value%${value##*[![:space:]]}}"
+
+        if [[ "$value" == \"*\" && "$value" == *\" ]]; then
+            value="${value:1:${#value}-2}"
+        elif [[ "$value" == \'*\' && "$value" == *\' ]]; then
+            value="${value:1:${#value}-2}"
+        fi
+
+        printf -v "$key" '%s' "$value"
+        export "$key"
+    done < "$path"
+}
+
 VAULTWARDEN_SERVICE="${VAULTWARDEN_SERVICE:-vaultwarden}"
 VAULTWARDEN_DATA_DIR="${VAULTWARDEN_DATA_DIR:-vaultwarden_data}"
 RESTIC_IMAGE="${RESTIC_IMAGE:-restic/restic:latest}"
@@ -54,8 +80,7 @@ if ! docker compose version >/dev/null 2>&1; then
 fi
 
 set -a
-# shellcheck disable=SC1091
-source ".env"
+load_env_file ".env"
 set +a
 
 if [[ -z "${RESTIC_REPOSITORY:-}" ]]; then
