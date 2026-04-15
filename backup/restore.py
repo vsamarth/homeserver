@@ -23,12 +23,12 @@ from backup_common import (
 
 def main() -> int:
     script_dir = Path(__file__).resolve().parent
-    os.chdir(script_dir)
+    repo_root = script_dir.parent
 
-    require_file(".env")
+    require_file(repo_root / ".env")
     require_command("docker")
 
-    load_env_into_process(".env")
+    load_env_into_process(repo_root / ".env")
 
     required_env = [
         "RESTIC_REPOSITORY",
@@ -44,6 +44,7 @@ def main() -> int:
     vaultwarden_data_dir = Path(os.environ.get("VAULTWARDEN_DATA_DIR", "vaultwarden_data"))
     restic_image = os.environ.get("RESTIC_IMAGE", "restic/restic:latest")
     snapshot_id = sys.argv[1] if len(sys.argv) > 1 else "latest"
+    vaultwarden_data_path = repo_root / vaultwarden_data_dir
 
     restore_root = Path(tempfile.mkdtemp(prefix="vaultwarden-restore-"))
     try:
@@ -86,10 +87,10 @@ def main() -> int:
             raise RuntimeError(f"Restored data was not found at {restored_source}")
 
         print("❯❯ Replacing current Vaultwarden data directory...")
-        if vaultwarden_data_dir.exists():
-            shutil.rmtree(vaultwarden_data_dir)
-        vaultwarden_data_dir.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copytree(restored_source, vaultwarden_data_dir)
+        if vaultwarden_data_path.exists():
+            shutil.rmtree(vaultwarden_data_path)
+        vaultwarden_data_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(restored_source, vaultwarden_data_path)
 
         if docker_container_exists(vaultwarden_service):
             print("❯❯ Starting Vaultwarden...")

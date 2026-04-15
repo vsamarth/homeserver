@@ -20,11 +20,11 @@ from backup_common import (
 
 def main() -> int:
     script_dir = Path(__file__).resolve().parent
-    os.chdir(script_dir)
+    repo_root = script_dir.parent
 
-    require_file(".env")
+    require_file(repo_root / ".env")
     require_command("docker")
-    load_env_into_process(".env")
+    load_env_into_process(repo_root / ".env")
 
     required_env = [
         "RESTIC_REPOSITORY",
@@ -46,7 +46,8 @@ def main() -> int:
         f"vaultwarden-{datetime.now().strftime('%Y%m%d-%H%M%S')}.tar.gz.age",
     )
 
-    if not vaultwarden_data_dir.is_dir():
+    vaultwarden_data_path = repo_root / vaultwarden_data_dir
+    if not vaultwarden_data_path.is_dir():
         raise RuntimeError(f"Missing Vaultwarden data directory: {vaultwarden_data_dir}")
 
     backup_dir.mkdir(parents=True, exist_ok=True)
@@ -75,7 +76,7 @@ def main() -> int:
             "run",
             "--rm",
             "-v",
-            f"{script_dir / vaultwarden_data_dir}:/source:ro",
+            f"{vaultwarden_data_path}:/source:ro",
             "-e",
             "RESTIC_REPOSITORY",
             "-e",

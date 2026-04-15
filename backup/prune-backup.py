@@ -11,12 +11,12 @@ from backup_common import load_env_into_process, require_command, require_file, 
 
 def main() -> int:
     script_dir = Path(__file__).resolve().parent
-    os.chdir(script_dir)
+    repo_root = script_dir.parent
 
-    require_file(".env")
+    require_file(repo_root / ".env")
     require_command("docker")
 
-    load_env_into_process(".env")
+    load_env_into_process(repo_root / ".env")
 
     required_env = [
         "RESTIC_REPOSITORY",
