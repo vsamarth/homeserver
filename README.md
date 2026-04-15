@@ -11,8 +11,14 @@ This stack now uses a simple `.env` file for secrets.
    - `VAULTWARDEN_ADMIN_TOKEN`
 2. Start the stack:
    ```bash
+   ./start-services.sh
+   ```
+
+   If you prefer to run Compose directly:
+   ```bash
    docker compose up -d
    ```
+   The script also checks and applies a couple of Docker daemon defaults if they are missing, including `100m` log rotation and `live-restore`.
 
 ## Server Bootstrap
 
@@ -23,6 +29,16 @@ curl -fsSL https://raw.githubusercontent.com/vsamarth/homeserver/main/setup-serv
 ```
 
 The script uses `samarth` by default and will reuse the first key in `/root/.ssh/authorized_keys` when run non-interactively.
+
+## Local Start
+
+On a server where Docker is already installed and the `.env` file is present, use:
+
+```bash
+./start-services.sh
+```
+
+This script creates the bind-mounted data directories, checks Docker daemon settings, pulls images, and starts the Compose stack.
 
 ## Notes
 
