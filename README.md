@@ -40,6 +40,24 @@ On a server where Docker is already installed and the `.env` file is present, us
 
 This script creates the bind-mounted data directories, checks Docker daemon settings, pulls images, and starts the Compose stack.
 
+## Claude Code Installer
+
+Use the helper script at the repo root to install Claude Code into your user account:
+
+```bash
+chmod +x install-claude-code.sh
+./install-claude-code.sh
+```
+
+The script runs Anthropic's installer, then adds `export PATH="$HOME/.local/bin:$PATH"` to `~/.bashrc` if it is not already present.
+It uses the upstream installer command:
+
+```bash
+curl -fsSL https://claude.ai/install.sh | bash
+```
+
+If your local `.env` contains `ANTHROPIC*` variables, the installer also writes them to `~/.config/claude-code/anthropic.env` and sources that file from `~/.bashrc` for future shells.
+
 ## Vaultwarden Backup
 
 These scripts back up and restore only `vaultwarden_data/`.
