@@ -54,6 +54,17 @@ def main() -> int:
     if docker_container_running(vaultwarden_service):
         print("❯❯ Creating a Vaultwarden database backup inside the container...")
         docker_exec(vaultwarden_service, ["/vaultwarden", "backup"])
+        print("❯❯ Normalizing Vaultwarden database backup files inside the container...")
+        backup_pattern = re.compile(r"db_\d{8}_\d{6}\.sqlite3$")
+        backup_files = sorted(
+            (file for file in vaultwarden_data_dir.glob("db_*.sqlite3") if backup_pattern.fullmatch(file.name)),
+            key=lambda file: file.name,
+        )
+        if backup_files:
+            latest_backup = backup_files[-1]
+            docker_exec(vaultwarden_service, ["mv", "-f", f"/data/{latest_backup.name}", "/data/db_backup.sqlite3"])
+            for stale_backup in backup_files[:-1]:
+                docker_exec(vaultwarden_service, ["rm", "-f", f"/data/{stale_backup.name}"])
     else:
         print("❯❯ Vaultwarden is not running; proceeding with filesystem backup only.")
 
@@ -80,14 +91,6 @@ def main() -> int:
             restic_tag,
         ]
     )
-
-    print("❯❯ Cleaning up generated Vaultwarden database backups...")
-    if docker_container_running(vaultwarden_service):
-        for backup_file in vaultwarden_data_dir.glob("db_*.sqlite3"):
-            if re.fullmatch(r"db_\d{8}_\d{6}\.sqlite3", backup_file.name):
-                docker_exec(vaultwarden_service, ["rm", "-f", f"/data/{backup_file.name}"])
-    else:
-        print("❯❯ Vaultwarden is not running; no generated database backup files to clean up.")
 
     print("❯❯ Vaultwarden backup completed")
     return 0
