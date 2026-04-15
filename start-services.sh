@@ -53,13 +53,12 @@ configure_docker_daemon() {
     tmp_file="$(mktemp)"
 
     print_info "Checking Docker daemon settings..."
-    if run_as_root python3 - "$daemon_file" "$tmp_file" <<'PY'
+    if python3 - "$daemon_file" <<'PY' >"$tmp_file"
 import json
 import os
 import sys
 
 daemon_file = sys.argv[1]
-tmp_file = sys.argv[2]
 
 defaults = {
     "live-restore": True,
@@ -97,11 +96,12 @@ else:
             log_opts[key] = value
             changed = True
 
-with open(tmp_file, "w", encoding="utf-8") as handle:
-    json.dump(config, handle, indent=2, sort_keys=True)
-    handle.write("\n")
+if changed:
+    json.dump(config, sys.stdout, indent=2, sort_keys=True)
+    sys.stdout.write("\n")
+    sys.exit(0)
 
-sys.exit(0 if changed else 3)
+sys.exit(3)
 PY
     then
         local backup_file="${daemon_file}.bak.$(date +%Y%m%d%H%M%S)"
