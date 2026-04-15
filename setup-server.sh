@@ -4,6 +4,16 @@
 # Run as root on a fresh Ubuntu 22.04/24.04 server
 
 set -e  # Exit on any error
+export DEBIAN_FRONTEND=noninteractive
+export APT_LISTCHANGES_FRONTEND=none
+export NEEDRESTART_MODE=a
+
+apt_run() {
+    apt-get -y -qq \
+        -o Dpkg::Options::="--force-confdef" \
+        -o Dpkg::Options::="--force-confold" \
+        "$@"
+}
 
 # ============================================
 # CONFIGURATION VARIABLES
@@ -221,11 +231,11 @@ print_success "UFW firewall configured and enabled"
 # TASK 4: System Update & Essential Packages
 # ============================================
 print_info "Updating system packages..."
-apt update -qq > /dev/null 2>&1
-apt upgrade -y -qq > /dev/null 2>&1
+apt-get update -qq > /dev/null 2>&1
+apt_run upgrade > /dev/null 2>&1
 
 print_info "Installing essential packages..."
-apt install -y -qq curl wget git htop vim ufw fail2ban unattended-upgrades apt-listchanges > /dev/null 2>&1
+apt_run install curl wget git htop vim ufw fail2ban unattended-upgrades apt-listchanges > /dev/null 2>&1
 
 print_success "System updated and essential packages installed"
 
@@ -284,8 +294,8 @@ if [[ "$INSTALL_DOCKER" == "yes" ]]; then
       "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
       $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-    apt update -qq > /dev/null 2>&1
-    apt install -y -qq docker-ce docker-ce-cli containerd.io docker-compose-plugin > /dev/null 2>&1
+    apt-get update -qq > /dev/null 2>&1
+    apt_run install docker-ce docker-ce-cli containerd.io docker-compose-plugin > /dev/null 2>&1
 
     # Add user to docker group
     usermod -aG docker "$NEW_USER" 2>/dev/null
@@ -299,7 +309,7 @@ fi
 if [[ "$INSTALL_MONITORING" == "yes" ]]; then
     print_info "Installing monitoring tools..."
 
-    apt install -y -qq glances net-tools iptraf-ng > /dev/null 2>&1
+    apt_run install glances net-tools iptraf-ng > /dev/null 2>&1
 
     print_success "Monitoring tools installed"
 fi
@@ -308,8 +318,8 @@ fi
 # TASK 9: Cleanup
 # ============================================
 print_info "Cleaning up..."
-apt autoremove -y -qq > /dev/null 2>&1
-apt clean > /dev/null 2>&1
+apt_run autoremove > /dev/null 2>&1
+apt-get clean > /dev/null 2>&1
 
 print_success "Cleanup completed"
 
