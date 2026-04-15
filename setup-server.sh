@@ -82,15 +82,24 @@ chown "$NEW_USER":"$NEW_USER" /home/"$NEW_USER"/.ssh
 
 # Get SSH public key
 if [[ -z "$SSH_KEY" ]]; then
-    if [[ -t 0 ]]; then
-        print_info "Enter SSH public key for $NEW_USER (starts with ssh-rsa or ssh-ed25519):"
-        read -r SSH_KEY
-    else
-        print_error "ERROR: No SSH key provided."
-        print_error "Please provide SSH key via:"
-        print_error "  1. Setting SSH_KEY variable: SSH_KEY=\"ssh-ed25519 AAAA...\" bash setup-server.sh"
-        print_error "  2. Running interactively (not via curl | bash)"
-        exit 1
+    if [[ -f /root/.ssh/authorized_keys ]]; then
+        SSH_KEY="$(grep -vE '^[[:space:]]*#|^[[:space:]]*$' /root/.ssh/authorized_keys | head -n 1)"
+        if [[ -n "$SSH_KEY" ]]; then
+            print_info "Using the first SSH key from /root/.ssh/authorized_keys"
+        fi
+    fi
+
+    if [[ -z "$SSH_KEY" ]]; then
+        if [[ -t 0 ]]; then
+            print_info "Enter SSH public key for $NEW_USER (starts with ssh-rsa or ssh-ed25519):"
+            read -r SSH_KEY
+        else
+            print_error "ERROR: No SSH key provided."
+            print_error "Please provide SSH key via:"
+            print_error "  1. Setting SSH_KEY variable: SSH_KEY=\"ssh-ed25519 AAAA...\" bash setup-server.sh"
+            print_error "  2. Running interactively (not via curl | bash)"
+            exit 1
+        fi
     fi
 fi
 
