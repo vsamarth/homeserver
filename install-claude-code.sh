@@ -25,8 +25,9 @@ fail() {
     exit 1
 }
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENV_SOURCE_FILE="$SCRIPT_DIR/.env"
+ENV_SOURCE_FILE="$PWD/.env"
+NANOENV_SOURCE_FILE="$PWD/.nanoenv"
+NANOCLAW_DIR="$HOME/nanoclaw"
 ANTHROPIC_ENV_DIR="$HOME/.config/claude-code"
 ANTHROPIC_ENV_FILE="$ANTHROPIC_ENV_DIR/anthropic.env"
 ANTHROPIC_BASHRC_BLOCK_BEGIN="# BEGIN claude-code anthropic env"
@@ -38,6 +39,10 @@ fi
 
 if ! command -v curl >/dev/null 2>&1; then
     fail "curl is required."
+fi
+
+if ! command -v git >/dev/null 2>&1; then
+    fail "git is required."
 fi
 
 info "Installing Claude Code"
@@ -140,6 +145,39 @@ append_bashrc_block() {
 
 write_anthropic_env_file "$ENV_SOURCE_FILE" "$ANTHROPIC_ENV_FILE"
 append_bashrc_block "$BASHRC" "$ANTHROPIC_BASHRC_BLOCK_BEGIN" "$ANTHROPIC_BASHRC_BLOCK_END" "$ANTHROPIC_ENV_FILE"
+
+clone_nanoclaw_repo() {
+    local repo_url="https://github.com/vsamarth/nanoclaw.git"
+
+    if [[ -d "$NANOCLAW_DIR/.git" ]]; then
+        info "nanoclaw already exists at $NANOCLAW_DIR"
+        return 0
+    fi
+
+    if [[ -e "$NANOCLAW_DIR" ]]; then
+        fail "$NANOCLAW_DIR exists but is not a git repository"
+    fi
+
+    info "Cloning nanoclaw into $NANOCLAW_DIR"
+    git clone "$repo_url" "$NANOCLAW_DIR"
+}
+
+copy_nanoclaw_env() {
+    if [[ ! -f "$NANOENV_SOURCE_FILE" ]]; then
+        fail "Missing .nanoenv in the current directory: $NANOENV_SOURCE_FILE"
+    fi
+
+    if [[ ! -d "$NANOCLAW_DIR" ]]; then
+        fail "nanoclaw directory not found at $NANOCLAW_DIR"
+    fi
+
+    cp "$NANOENV_SOURCE_FILE" "$NANOCLAW_DIR/.env"
+    chmod 600 "$NANOCLAW_DIR/.env"
+    success "Copied .nanoenv to $NANOCLAW_DIR/.env"
+}
+
+clone_nanoclaw_repo
+copy_nanoclaw_env
 
 # Update the current script shell so follow-up checks see the new PATH.
 # This does not change the parent shell; open a new terminal or source ~/.bashrc there.

@@ -58,6 +58,8 @@ curl -fsSL https://claude.ai/install.sh | bash
 
 If your local `.env` contains `ANTHROPIC*` variables, the installer also writes them to `~/.config/claude-code/anthropic.env` and sources that file from `~/.bashrc` for future shells.
 
+If you run the installer from a directory containing `.nanoenv`, it also clones `https://github.com/vsamarth/nanoclaw` into `~/nanoclaw` and copies that `.nanoenv` to `~/nanoclaw/.env`.
+
 ## Vaultwarden Backup
 
 These scripts back up and restore only `vaultwarden_data/`.
