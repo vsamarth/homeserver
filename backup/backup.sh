@@ -44,7 +44,6 @@ else
     if [[ -n "$LATEST_BACKUP" ]]; then
         BACKUP_NAME=$(basename "$LATEST_BACKUP")
         docker exec vaultwarden mv -f "/data/$BACKUP_NAME" /data/db_backup.sqlite3
-        docker exec vaultwarden rm -f /data/db_*.sqlite3
     fi
 fi
 
@@ -56,3 +55,5 @@ restic -r "$RESTIC_REPOSITORY" backup "$REPO_ROOT/$VAULTWARDEN_DATA_DIR/rsa_key.
 restic -r "$RESTIC_REPOSITORY" backup "$REPO_ROOT/$VAULTWARDEN_DATA_DIR/db_backup.sqlite3" --tag "$RESTIC_TAG"
 
 echo "❯❯ Vaultwarden attachments backup completed"
+
+rm vaultwarden_data/db_*.sqlite3
