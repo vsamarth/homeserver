@@ -36,11 +36,7 @@ def load_env_file(path: str | Path) -> dict[str, str]:
         if not key:
             continue
 
-        if (
-            len(value) >= 2
-            and value[0] == value[-1]
-            and value[0] in {"'", '"'}
-        ):
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in {"'", '"'}:
             value = value[1:-1]
         else:
             value = re.split(r"\s+#", value, maxsplit=1)[0].rstrip()
@@ -56,12 +52,15 @@ def load_env_into_process(path: str | Path) -> dict[str, str]:
     return env
 
 
-def run(cmd: list[str], *, check: bool = True, capture_output: bool = False) -> subprocess.CompletedProcess[str]:
+def run(
+    cmd: list[str], *, check: bool = True, capture_output: bool = False
+) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         cmd,
         check=check,
         text=True,
         capture_output=capture_output,
+        env=os.environ,
     )
 
 
