@@ -48,7 +48,8 @@ RESTIC_TAG="${RESTIC_TAG:-vaultwarden}"
 #     fi
 # fi
 
-echo "❯❯ Uploading Vaultwarden attachments to restic..."
+echo "❯❯ Uploading Vaultwarden to restic..."
 restic -r "$RESTIC_REPOSITORY" backup "$REPO_ROOT/$VAULTWARDEN_DATA_DIR/attachments" --tag "$RESTIC_TAG"
+restic -r "$RESTIC_REPOSITORY" backup "$REPO_ROOT/$VAULTWARDEN_DATA_DIR/send" --tag "$RESTIC_TAG"
 
 echo "❯❯ Vaultwarden attachments backup completed"
