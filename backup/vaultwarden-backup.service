@@ -4,4 +4,4 @@ Description=Back up Vaultwarden data to restic
 [Service]
 Type=oneshot
 WorkingDirectory=/home/samarth/server
-ExecStart=/usr/bin/python3 /home/samarth/server/backup/backup.py
+ExecStart=/home/samarth/server/backup/backup.sh
