@@ -27,7 +27,7 @@ done
 VAULTWARDEN_DATA_DIR="${VAULTWARDEN_DATA_DIR:-vaultwarden_data}"
 VAULTWARDEN_ATTACHMENTS_DIR="attachments"
 RESTIC_IMAGE="${RESTIC_IMAGE:-restic/restic:latest}"
-RESTIC_TAG="${RESTIC_TAG:-vaultwarden-attachments}"
+RESTIC_TAG="${RESTIC_TAG:-vaultwarden}"
 
 if ! docker ps --format '{{.Names}}' | grep -q "^vaultwarden$"; then
     echo "❯❯ Vaultwarden is not running; proceeding with filesystem backup only."
