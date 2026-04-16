@@ -25,8 +25,9 @@ for var in "${required_vars[@]}"; do
 done
 
 VAULTWARDEN_DATA_DIR="${VAULTWARDEN_DATA_DIR:-vaultwarden_data}"
+VAULTWARDEN_ATTACHMENTS_DIR="attachments"
 RESTIC_IMAGE="${RESTIC_IMAGE:-restic/restic:latest}"
-RESTIC_TAG="${RESTIC_TAG:-vaultwarden}"
+RESTIC_TAG="${RESTIC_TAG:-vaultwarden-attachments}"
 
 if ! docker ps --format '{{.Names}}' | grep -q "^vaultwarden$"; then
     echo "❯❯ Vaultwarden is not running; proceeding with filesystem backup only."
@@ -43,13 +44,13 @@ else
     fi
 fi
 
-echo "❯❯ Uploading Vaultwarden data to restic..."
+echo "❯❯ Uploading Vaultwarden attachments to restic..."
 docker run --rm \
-    -v "$REPO_ROOT/$VAULTWARDEN_DATA_DIR:/source:ro" \
+    -v "$REPO_ROOT/$VAULTWARDEN_DATA_DIR/attachments:/source:ro" \
     -e RESTIC_REPOSITORY \
     -e RESTIC_PASSWORD \
     -e B2_ACCOUNT_ID \
     -e B2_ACCOUNT_KEY \
     "$RESTIC_IMAGE" backup /source --tag "$RESTIC_TAG"
 
-echo "❯❯ Vaultwarden backup completed"
+echo "❯❯ Vaultwarden attachments backup completed"
