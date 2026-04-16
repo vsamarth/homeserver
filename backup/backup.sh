@@ -24,9 +24,13 @@ for var in "${required_vars[@]}"; do
     fi
 done
 
+if ! command -v restic &> /dev/null; then
+    echo "Error: restic is not installed"
+    echo "Install with: apt install restic"
+    exit 1
+fi
+
 VAULTWARDEN_DATA_DIR="${VAULTWARDEN_DATA_DIR:-vaultwarden_data}"
-VAULTWARDEN_ATTACHMENTS_DIR="attachments"
-RESTIC_IMAGE="${RESTIC_IMAGE:-restic/restic:latest}"
 RESTIC_TAG="${RESTIC_TAG:-vaultwarden}"
 
 # if ! docker ps --format '{{.Names}}' | grep -q "^vaultwarden$"; then
@@ -45,12 +49,6 @@ RESTIC_TAG="${RESTIC_TAG:-vaultwarden}"
 # fi
 
 echo "❯❯ Uploading Vaultwarden attachments to restic..."
-docker run --rm \
-    -v "$REPO_ROOT/$VAULTWARDEN_DATA_DIR/attachments:/source:ro" \
-    -e RESTIC_REPOSITORY \
-    -e RESTIC_PASSWORD \
-    -e B2_ACCOUNT_ID \
-    -e B2_ACCOUNT_KEY \
-    "$RESTIC_IMAGE" backup /source --tag "$RESTIC_TAG"
+restic -r "$RESTIC_REPOSITORY" backup "$REPO_ROOT/$VAULTWARDEN_DATA_DIR/attachments" --tag "$RESTIC_TAG"
 
 echo "❯❯ Vaultwarden attachments backup completed"
