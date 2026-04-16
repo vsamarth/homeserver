@@ -3,6 +3,8 @@ services:
     image: caddybuilds/caddy-cloudflare:alpine
     container_name: caddy
     restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     environment:
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
     ports:
@@ -25,6 +27,8 @@ services:
     image: henrygd/beszel:latest
     container_name: beszel
     restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     ports:
       - 8090:8090
     volumes:
@@ -45,6 +49,8 @@ services:
     image: henrygd/beszel-agent
     container_name: beszel-agent
     restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     network_mode: host
     security_opt:
       - apparmor:unconfined
@@ -72,6 +78,8 @@ services:
     image: vaultwarden/server:latest
     container_name: vaultwarden
     restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     volumes:
       - ./vaultwarden_data:/data
     environment:
@@ -85,6 +93,19 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+    networks:
+      - home-net
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_LABEL_ENABLE=true
+      - WATCHTOWER_POLL_INTERVAL=86400
     networks:
       - home-net
 
