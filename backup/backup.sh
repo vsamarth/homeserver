@@ -32,6 +32,7 @@ fi
 
 VAULTWARDEN_DATA_DIR="${VAULTWARDEN_DATA_DIR:-vaultwarden_data}"
 RESTIC_TAG="${RESTIC_TAG:-vaultwarden}"
+CLEANUP_SUDO="${CLEANUP_SUDO:-sudo}"
 
 if ! docker ps --format '{{.Names}}' | grep -q "^vaultwarden$"; then
     echo "❯❯ Vaultwarden is not running; proceeding with filesystem backup only."
@@ -53,6 +54,6 @@ restic -r "$RESTIC_REPOSITORY" backup "$REPO_ROOT/$VAULTWARDEN_DATA_DIR/sends" -
 restic -r "$RESTIC_REPOSITORY" backup "$REPO_ROOT/$VAULTWARDEN_DATA_DIR/rsa_key.pem" --tag "$RESTIC_TAG"
 restic -r "$RESTIC_REPOSITORY" backup "$REPO_ROOT/$VAULTWARDEN_DATA_DIR/db_backup.sqlite3" --tag "$RESTIC_TAG"
 
-echo "❯❯ Vaultwarden attachments backup completed"
+echo "❯❯ Vaultwarden backup completed"
 
-sudo rm vaultwarden_data/db_*.sqlite3
+$CLEANUP_SUDO rm -f "$VAULTWARDEN_DATA_DIR/db_*.sqlite3"
