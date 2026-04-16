@@ -33,24 +33,25 @@ fi
 VAULTWARDEN_DATA_DIR="${VAULTWARDEN_DATA_DIR:-vaultwarden_data}"
 RESTIC_TAG="${RESTIC_TAG:-vaultwarden}"
 
-# if ! docker ps --format '{{.Names}}' | grep -q "^vaultwarden$"; then
-#     echo "❯❯ Vaultwarden is not running; proceeding with filesystem backup only."
-# else
-#     echo "❯❯ Creating a Vaultwarden database backup inside the container..."
-#     docker exec vaultwarden /vaultwarden backup
-#
-#     echo "❯❯ Normalizing Vaultwarden database backup files inside the container..."
-#     LATEST_BACKUP=$(docker exec vaultwarden ls -1 /data/db_*.sqlite3 2>/dev/null | sort | tail -1)
-#     if [[ -n "$LATEST_BACKUP" ]]; then
-#         BACKUP_NAME=$(basename "$LATEST_BACKUP")
-#         docker exec vaultwarden mv -f "/data/$BACKUP_NAME" /data/db_backup.sqlite3
-#         docker exec vaultwarden rm -f /data/db_*.sqlite3
-#     fi
-# fi
+if ! docker ps --format '{{.Names}}' | grep -q "^vaultwarden$"; then
+    echo "❯❯ Vaultwarden is not running; proceeding with filesystem backup only."
+else
+    echo "❯❯ Creating a Vaultwarden database backup inside the container..."
+    docker exec vaultwarden /vaultwarden backup
+
+    echo "❯❯ Normalizing Vaultwarden database backup files inside the container..."
+    LATEST_BACKUP=$(docker exec vaultwarden ls -1 /data/db_*.sqlite3 2>/dev/null | sort | tail -1)
+    if [[ -n "$LATEST_BACKUP" ]]; then
+        BACKUP_NAME=$(basename "$LATEST_BACKUP")
+        docker exec vaultwarden mv -f "/data/$BACKUP_NAME" /data/db_backup.sqlite3
+        docker exec vaultwarden rm -f /data/db_*.sqlite3
+    fi
+fi
 
 echo "❯❯ Uploading Vaultwarden to restic..."
 restic -r "$RESTIC_REPOSITORY" backup "$REPO_ROOT/$VAULTWARDEN_DATA_DIR/attachments" --tag "$RESTIC_TAG"
 restic -r "$RESTIC_REPOSITORY" backup "$REPO_ROOT/$VAULTWARDEN_DATA_DIR/sends" --tag "$RESTIC_TAG"
 restic -r "$RESTIC_REPOSITORY" backup "$REPO_ROOT/$VAULTWARDEN_DATA_DIR/config.json" --tag "$RESTIC_TAG"
+restic -r "$RESTIC_REPOSITORY" backup "$REPO_ROOT/$VAULTWARDEN_DATA_DIR/rsa_key.pem" --tag "$RESTIC_TAG"
 
 echo "❯❯ Vaultwarden attachments backup completed"
