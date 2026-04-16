@@ -2,7 +2,7 @@
 	acme_dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 }
 
-home.samarthv.com {
+status.samarthv.com {
 	request_body {
 		max_size 10MB
 	}

@@ -35,7 +35,7 @@ services:
       - ./beszel_data:/beszel_data
       - ./beszel_socket:/beszel_socket
     environment:
-      APP_URL: https://home.samarthv.com
+      APP_URL: https://status.samarthv.com
     healthcheck:
       test: ["CMD", "/beszel", "health", "--url", "http://localhost:8090"]
       interval: 120s
@@ -66,7 +66,7 @@ services:
       LISTEN: "45876"
       TOKEN: ${BESZEL_AGENT_TOKEN}
       KEY: ${BESZEL_AGENT_KEY}
-      HUB_URL: https://home.samarthv.com
+      HUB_URL: https://status.samarthv.com
     healthcheck:
       test: ["CMD", "/agent", "health"]
       interval: 120s
