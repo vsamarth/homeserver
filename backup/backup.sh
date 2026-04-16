@@ -50,10 +50,9 @@ fi
 echo "❯❯ Uploading Vaultwarden to restic..."
 restic -r "$RESTIC_REPOSITORY" backup "$REPO_ROOT/$VAULTWARDEN_DATA_DIR/attachments" --tag "$RESTIC_TAG"
 restic -r "$RESTIC_REPOSITORY" backup "$REPO_ROOT/$VAULTWARDEN_DATA_DIR/sends" --tag "$RESTIC_TAG"
-restic -r "$RESTIC_REPOSITORY" backup "$REPO_ROOT/$VAULTWARDEN_DATA_DIR/config.json" --tag "$RESTIC_TAG"
 restic -r "$RESTIC_REPOSITORY" backup "$REPO_ROOT/$VAULTWARDEN_DATA_DIR/rsa_key.pem" --tag "$RESTIC_TAG"
 restic -r "$RESTIC_REPOSITORY" backup "$REPO_ROOT/$VAULTWARDEN_DATA_DIR/db_backup.sqlite3" --tag "$RESTIC_TAG"
 
 echo "❯❯ Vaultwarden attachments backup completed"
 
-rm vaultwarden_data/db_*.sqlite3
+sudo rm vaultwarden_data/db_*.sqlite3
