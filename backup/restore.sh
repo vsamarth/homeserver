@@ -56,14 +56,14 @@ restic -r "$RESTIC_REPOSITORY" restore "$SNAPSHOT_ID" --target "$RESTORE_DIR" --
 
 echo "❯❯ Restoring to $VAULTWARDEN_RESTORE_DIR..."
 if [[ -d "$VAULTWARDEN_RESTORE_DIR" ]]; then
-    sudo rm -rf "$VAULTWARDEN_RESTORE_DIR"
+    rm -rf "$VAULTWARDEN_RESTORE_DIR"
 fi
-sudo mkdir -p "$VAULTWARDEN_RESTORE_DIR"
+mkdir -p "$VAULTWARDEN_RESTORE_DIR"
 for item in attachments sends rsa_key.pem db_backup.sqlite3; do
     if [[ -f "$RESTORE_DIR/vaultwarden_data/$item" ]]; then
-        sudo cp -r "$RESTORE_DIR/vaultwarden_data/$item" "$VAULTWARDEN_RESTORE_DIR/"
+        cp -r "$RESTORE_DIR/vaultwarden_data/$item" "$VAULTWARDEN_RESTORE_DIR/"
     elif [[ -f "$RESTORE_DIR/$item" ]]; then
-        sudo cp -r "$RESTORE_DIR/$item" "$VAULTWARDEN_RESTORE_DIR/"
+        cp -r "$RESTORE_DIR/$item" "$VAULTWARDEN_RESTORE_DIR/"
     fi
 done
 
