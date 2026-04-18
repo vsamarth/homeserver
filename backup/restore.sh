@@ -59,18 +59,12 @@ if [[ -d "$VAULTWARDEN_RESTORE_DIR" ]]; then
     rm -rf "$VAULTWARDEN_RESTORE_DIR"
 fi
 mkdir -p "$VAULTWARDEN_RESTORE_DIR"
-echo "RESTORE_DIR contents:"
-find "$RESTORE_DIR" -type f -o -type d | head -20
-for item in vaultwarden_data/attachments vaultwarden_data/sends vaultwarden_data/rsa_key.pem vaultwarden_data/db_backup.sqlite3; do
-    if [[ -e "$RESTORE_DIR/$item" ]]; then
-        cp -r "$RESTORE_DIR/$item" "$VAULTWARDEN_RESTORE_DIR/"
+for item in attachments sends rsa_key.pem db_backup.sqlite3; do
+    src="$RESTORE_DIR/home/samarth/server/vaultwarden_data/$item"
+    if [[ -e "$src" ]]; then
+        cp -r "$src" "$VAULTWARDEN_RESTORE_DIR/"
     fi
 done
-
-if [[ -d "$VAULTWARDEN_RESTORE_DIR/vaultwarden_data" ]]; then
-    mv "$VAULTWARDEN_RESTORE_DIR/vaultwarden_data"/* "$VAULTWARDEN_RESTORE_DIR/"
-    rmdir "$VAULTWARDEN_RESTORE_DIR/vaultwarden_data"
-fi
 
 if docker ps -a --format '{{.Names}}' | grep -q "^${VAULTWARDEN_SERVICE}$"; then
     echo "❯❯ Starting Vaultwarden..."
