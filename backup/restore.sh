@@ -32,6 +32,7 @@ fi
 
 VAULTWARDEN_SERVICE="${VAULTWARDEN_SERVICE:-vaultwarden}"
 VAULTWARDEN_DATA_DIR="${VAULTWARDEN_DATA_DIR:-vaultwarden_data}"
+VAULTWARDEN_RESTORE_DIR="${VAULTWARDEN_RESTORE_DIR:-vaultwarden_backup}"
 SNAPSHOT_ID="${1:-latest}"
 
 if [[ "$SNAPSHOT_ID" == "latest" ]]; then
@@ -51,14 +52,14 @@ RESTORE_DIR=$(mktemp -d)
 trap "rm -rf $RESTORE_DIR" EXIT
 
 echo "❯❯ Restoring from restic..."
-restic -r "$RESTIC_REPOSITORY" restore "$SNAPSHOT_ID" --target "$RESTORE_DIR"
+restic -r "$RESTIC_REPOSITORY" restore "$SNAPSHOT_ID" --target "$RESTORE_DIR" --include "vaultwarden_data/attachments" --include "vaultwarden_data/sends" --include "vaultwarden_data/rsa_key.pem" --include "vaultwarden_data/db_backup.sqlite3"
 
-echo "❯❯ Replacing current Vaultwarden data directory..."
-if [[ -d "$VAULTWARDEN_DATA_DIR" ]]; then
-    sudo rm -rf "$VAULTWARDEN_DATA_DIR"
+echo "❯❯ Restoring to $VAULTWARDEN_RESTORE_DIR..."
+if [[ -d "$VAULTWARDEN_RESTORE_DIR" ]]; then
+    sudo rm -rf "$VAULTWARDEN_RESTORE_DIR"
 fi
-sudo mkdir -p "$VAULTWARDEN_DATA_DIR"
-sudo cp -r "$RESTORE_DIR"/vaultwarden_data/* "$VAULTWARDEN_DATA_DIR/" 2>/dev/null || sudo cp -r "$RESTORE_DIR"/* "$VAULTWARDEN_DATA_DIR/"
+sudo mkdir -p "$VAULTWARDEN_RESTORE_DIR"
+sudo cp -r "$RESTORE_DIR/vaultwarden_data/"* "$VAULTWARDEN_RESTORE_DIR/"
 
 if docker ps -a --format '{{.Names}}' | grep -q "^${VAULTWARDEN_SERVICE}$"; then
     echo "❯❯ Starting Vaultwarden..."
