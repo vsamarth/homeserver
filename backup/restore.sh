@@ -52,13 +52,15 @@ RESTORE_DIR=$(mktemp -d)
 trap "rm -rf $RESTORE_DIR" EXIT
 
 echo "❯❯ Restoring from restic..."
-restic -r "$RESTIC_REPOSITORY" restore "$SNAPSHOT_ID" --target "$RESTORE_DIR" --include "vaultwarden_data/attachments" --include "vaultwarden_data/sends" --include "vaultwarden_data/rsa_key.pem" --include "vaultwarden_data/db_backup.sqlite3"
+restic -r "$RESTIC_REPOSITORY" restore "$SNAPSHOT_ID" --target "$RESTORE_DIR" --include "/home/samarth/server/vaultwarden_data/attachments" --include "/home/samarth/server/vaultwarden_data/sends" --include "/home/samarth/server/vaultwarden_data/rsa_key.pem" --include "/home/samarth/server/vaultwarden_data/db_backup.sqlite3"
 
 echo "❯❯ Restoring to $VAULTWARDEN_RESTORE_DIR..."
 if [[ -d "$VAULTWARDEN_RESTORE_DIR" ]]; then
     rm -rf "$VAULTWARDEN_RESTORE_DIR"
 fi
 mkdir -p "$VAULTWARDEN_RESTORE_DIR"
+echo "RESTORE_DIR contents:"
+find "$RESTORE_DIR" -type f -o -type d | head -20
 for item in vaultwarden_data/attachments vaultwarden_data/sends vaultwarden_data/rsa_key.pem vaultwarden_data/db_backup.sqlite3; do
     if [[ -e "$RESTORE_DIR/$item" ]]; then
         cp -r "$RESTORE_DIR/$item" "$VAULTWARDEN_RESTORE_DIR/"
