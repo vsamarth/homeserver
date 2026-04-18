@@ -53,17 +53,12 @@ trap "rm -rf $RESTORE_DIR" EXIT
 echo "❯❯ Restoring from restic..."
 restic -r "$RESTIC_REPOSITORY" restore "$SNAPSHOT_ID" --target "$RESTORE_DIR"
 
-RESTORED_SOURCE="$RESTORE_DIR/source"
-if [[ ! -d "$RESTORED_SOURCE" ]]; then
-    echo "Error: Restored data was not found"
-    exit 1
-fi
-
 echo "❯❯ Replacing current Vaultwarden data directory..."
 if [[ -d "$VAULTWARDEN_DATA_DIR" ]]; then
     sudo rm -rf "$VAULTWARDEN_DATA_DIR"
 fi
-sudo cp -r "$RESTORED_SOURCE" "$VAULTWARDEN_DATA_DIR"
+sudo mkdir -p "$VAULTWARDEN_DATA_DIR"
+sudo cp -r "$RESTORE_DIR"/vaultwarden_data/* "$VAULTWARDEN_DATA_DIR/" 2>/dev/null || sudo cp -r "$RESTORE_DIR"/* "$VAULTWARDEN_DATA_DIR/"
 
 if docker ps -a --format '{{.Names}}' | grep -q "^${VAULTWARDEN_SERVICE}$"; then
     echo "❯❯ Starting Vaultwarden..."
