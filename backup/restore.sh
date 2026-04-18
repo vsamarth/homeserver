@@ -59,6 +59,8 @@ if [[ -d "$VAULTWARDEN_RESTORE_DIR" ]]; then
     rm -rf "$VAULTWARDEN_RESTORE_DIR"
 fi
 mkdir -p "$VAULTWARDEN_RESTORE_DIR"
+echo "Contents of RESTORE_DIR:"
+ls -laR "$RESTORE_DIR"
 for item in attachments sends rsa_key.pem db_backup.sqlite3; do
     if [[ -e "$RESTORE_DIR/vaultwarden_data/$item" ]]; then
         cp -r "$RESTORE_DIR/vaultwarden_data/$item" "$VAULTWARDEN_RESTORE_DIR/"
