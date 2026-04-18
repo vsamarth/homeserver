@@ -59,7 +59,13 @@ if [[ -d "$VAULTWARDEN_RESTORE_DIR" ]]; then
     sudo rm -rf "$VAULTWARDEN_RESTORE_DIR"
 fi
 sudo mkdir -p "$VAULTWARDEN_RESTORE_DIR"
-sudo cp -r "$RESTORE_DIR/vaultwarden_data/"* "$VAULTWARDEN_RESTORE_DIR/"
+for item in attachments sends rsa_key.pem db_backup.sqlite3; do
+    if [[ -f "$RESTORE_DIR/vaultwarden_data/$item" ]]; then
+        sudo cp -r "$RESTORE_DIR/vaultwarden_data/$item" "$VAULTWARDEN_RESTORE_DIR/"
+    elif [[ -f "$RESTORE_DIR/$item" ]]; then
+        sudo cp -r "$RESTORE_DIR/$item" "$VAULTWARDEN_RESTORE_DIR/"
+    fi
+done
 
 if docker ps -a --format '{{.Names}}' | grep -q "^${VAULTWARDEN_SERVICE}$"; then
     echo "❯❯ Starting Vaultwarden..."
